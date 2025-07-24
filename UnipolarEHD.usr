@@ -104,14 +104,14 @@
 	include 'SIZE'
 	include 'TOTAL'
 	include 'NEKUSE'
-	common /mygeom/ xmn,xmx,ymn,ymx,zmn,zmx
+	common /domainSize/ dy
 	integer ie
 	ie = gllel(eg)
 	ux = 0.0; uy = 0.0; uz = 0.0; temp = 0.0
 	if(ifield .eq. 2) temp = 0.0 ! Temperature
 
 	if(ifield .eq. 3) then 
-		dy = ymx-ymn
+		
 		if (y .lt. ymin+1.e-5*dy) then
 			temp = uparam(3)! Potential Difference
 		else
@@ -120,11 +120,10 @@
 	endif
 
 	if(ifield .eq. 4) then 
-		if (y .eq. ymin) then
+		if (y .lt. ymin+1.e-5*dy) then
 			temp = uparam(4) ! Charge Density
 		endif
 	endif
-
 	return
 	end
 !----------------------------------------------------------------------------------
@@ -168,8 +167,11 @@
 	!--------------------------------------------------------------
 
 
-	common /mygeom/ xmn,xmx,ymn,ymx,zmn,zmx
-	if (istep.eq.0) call domain_size(xmn,xmx,ymn,ymx,zmn,zmx)
+	common /domainSize/ dy
+	if (istep.eq.0) then 
+		call domain_size(xmn,xmx,ymn,ymx,zmn,zmx)
+		dy = ymx-ymn
+	endif
 	!--------------------------------------------------------------
 	!------------------------DEBUGGING ----------------------------
 	!--------------------------------------------------------------
