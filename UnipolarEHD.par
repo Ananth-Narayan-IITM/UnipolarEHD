@@ -1,0 +1,45 @@
+[GENERAL]
+dt = 100
+numsteps = 1000
+writeInterval = 100
+#----------------------------------------------------------------------------------
+#----------------------------------- User Parameters ----------------------------------------
+#----------------------------------------------------------------------------------
+userParam01 = 1e-8 # ionDiffusivity
+userParam02 = 1.0 # Relative Permittivity
+userParam03 = 74.3924 # Potential Difference (Boundary Conditions)
+userParam04 = 6.5867e-11 # Charge Density (Boundary Conditions)
+userParam05 = 5.3769e-07 # ionMobility
+userParam06 = 0.0 # ionConductivity
+
+[VELOCITY] # ifield = 1, i = 0
+density = 1.225
+viscosity = 1.225e-5
+boundaryTypeMap = P  ,W  ,W  ,P
+residualTol = 1e-6
+
+[PRESSURE]
+residualTol = 1e-4
+
+[TEMPERATURE] # Temperature ifield = 2, i = 0
+solver = none
+
+[SCALAR01]  # Potential Difference ifield = 3, i = 1
+density     = 1.0 # Involves Transient evolution
+diffusivity = 1.0 # Fixed
+boundaryTypeMap = P  ,t  ,t  ,P
+residualTol = 1e-6
+
+[SCALAR02]  # Charge Density ifield = 4, i = 2
+density     = 1.0 # Fixed
+diffusivity = 1.0 # close to 0.0
+boundaryTypeMap = P  ,SYM,t  ,P
+residualTol = 1e-6
+
+[SCALAR03]  # ionMobility ifield = 5, i = 3
+solver = none
+
+# [SCALAR04]  # ionConductivity ifield = 6, i = 4
+# solver = none
+
+

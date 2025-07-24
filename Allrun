@@ -1,0 +1,7 @@
+#!/bin/sh
+rm *.nek5000
+rm *.f*
+makenek
+nek UnipolarEHD
+visnek
+paraview --data=UnipolarEHD.nek5000

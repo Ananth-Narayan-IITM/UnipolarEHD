@@ -1,0 +1,216 @@
+!----------------------------------------------------------------------------------
+!-----------------------------------TODO ------------------------------------------
+!----------------------------------------------------------------------------------
+
+! [X] Understand working of gradm1
+! [X] Understand working of outpost
+! [X] Validate the gradm1 solver using Paraview [Seems OK]
+! [X] Validate the gradm1 solver using various analytical equations (saved as Archive/a2R2_gradm1.usr)[Works as expected- Seems OK] 
+! [X] Formulate the solver to solve Unipolar injection
+! [ ] No velocity calculation in the solver
+! 	[X] Potential Difference is wrong at infinite time.- OK (initial conditions were set to 0.0)
+! 	[ ] Check Momentum source term values- Charge Density t(:,:,:,:,3)- OK, Electric Field Ex = 0, Ey = 74.32, Ez = 0- Wierd
+!	[ ] 
+
+!----------------------------------------------------------------------------------
+!-----------------------------------DOCUMENTATION ---------------------------------
+!----------------------------------------------------------------------------------
+
+! lx1 - Polynomial Order of (lx1-1)
+! ly1 - Polynomial Order of (ly1-1)
+! lz1 - Polynomial Order of (lz1-1)
+! nelt = nelv - Number of mesh elements (Mx-1)*(My-1)
+! Mx, My - Mesh along X and Y axis
+! lelv = lelt - Defined from SIZE file. (Same as lelt=lelg/lpmin + 3). is the upper bound on number of elements, per processor
+! Size(vx) - lx1*ly1*lz1*lelv
+! ldimt - Maximum Scalars, from SIZE file.
+! Size(t(:,:,:,:,X)) - lx1*ly1*lz1*lelt*1
+! Size(t(:,:,:,:,:)) - lx1*ly1*lz1*lelt*ldimt
+! nx1, ny1, nz1- Denotes the Polynomial order (~ lx1, ly1, lz1)
+
+
+! Fortran data is stored in column major order
+
+!----------------------------------------------------------------------------------
+!-----------------------------------gradm1 ----------------------------------------
+!----------------------------------------------------------------------------------
+
+! 0. Use "grep -rnw $pwd -e '<TextToSearch>'" to search in all text files under '$pwd' (physical working directory) for certain keywords
+! 1. Say for example, to calculate the gradient of 'ywd' as 'call gradm1 (dfdx_omegb,dfdy_omegb,dfdz_omegb,   ywd)'
+! 2. Size of the inputs and outputs are: 'ywd (lx1,ly1,lz1,lelt)', 'dfdx_omegb  (lx1,ly1,lz1,lelv)', 'dfdy_omegb  (lx1,ly1,lz1,lelv)', 'dfdz_omegb  (lx1,ly1,lz1,lelv)'
+
+!----------------------------------------------------------------------------------
+!-----------------------------------USERVP ----------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine uservp(ix,iy,iz,eg) ! Set variable properties
+	! implicit none
+	
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE'
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERF -----------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine userf(ix,iy,iz,eg) ! Set acceleration term
+	integer ix,iy,iz,eg
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE'
+	!--------------------------------------------------------------
+	!------------------------Declaration --------------------------
+	!--------------------------------------------------------------
+	ie = gllel(eg) ! To be present after all declarations
+	!--------------------------------------------------------------
+	!------------------------Force --------------------------------
+	!--------------------------------------------------------------
+	ffx = 0.0
+	ffy = 0.0
+	ffz = 0.0
+	!--------------------------------------------------------------
+	!------------------------Debugging ----------------------------
+	!--------------------------------------------------------------
+
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERQ -----------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine userq(ix,iy,iz,eg) ! Sets Source Terms
+	integer ix,iy,iz,eg
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE' 
+	!--------------------------------------------------------------
+	!------------------------Declaration --------------------------
+	!--------------------------------------------------------------
+	ie = gllel(eg) ! To be present after all declarations
+	!--------------------------------------------------------------
+	!------------------------ Potential Difference ----------------
+	!--------------------------------------------------------------
+	qvol = 0.0
+	avol = 0.0
+	!--------------------------------------------------------------
+	!------------------------Debugging ----------------------------
+	!--------------------------------------------------------------
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERBC ----------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine userbc(ix,iy,iz,iside,eg) ! Set Boundary Conditions
+	! implicit none
+	integer ix,iy,iz,iside,eg
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE'
+	common /mygeom/ xmn,xmx,ymn,ymx,zmn,zmx
+	integer ie
+	ie = gllel(eg)
+	ux = 0.0; uy = 0.0; uz = 0.0; temp = 0.0
+	if(ifield .eq. 2) temp = 0.0 ! Temperature
+
+	if(ifield .eq. 3) then 
+		dy = ymx-ymn
+		if (y .lt. ymin+1.e-5*dy) then
+			temp = uparam(3)! Potential Difference
+		else
+			temp = 0.0
+		endif
+	endif
+
+	if(ifield .eq. 4) then 
+		if (y .eq. ymin) then
+			temp = uparam(4) ! Charge Density
+		endif
+	endif
+
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERIC ----------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine useric(ix,iy,iz,eg) ! Set Initial Conditions
+	integer ix,iy,iz,eg
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE'
+	ie = gllel(eg)
+
+	ux = 0.0; uy = 0.0; uz = 0.0;
+	if (ifield .eq. 2) temp = 0.0 ! No temperature equation
+	if (ifield .eq. 3) temp = uparam(3)*0.0 ! Initial Potential Difference
+	if (ifield .eq. 4) temp = 0.0 ! Initial Charge Density
+	if (ifield .eq. 5) temp = uparam(5) ! ionMobility
+	if (ifield .eq. 6) temp = uparam(6) ! ionConductivity
+
+	!********** Either of the (above or below) code snippet works *********************************
+
+	! Remodifying the above codes with t(:,:,:,:X) so as to control the parameters
+	! t(ix,iy,iz,ie,1) = 0.0 ! No temperature equation
+	! t(ix,iy,iz,ie,2) = 0.0 ! Initial Potential Difference
+	! t(ix,iy,iz,ie,3) = 0.0 ! Initial Charge Density
+	! t(ix,iy,iz,ie,4) = uparam(5) ! ionMobility
+	! t(ix,iy,iz,ie,5) = uparam(6) ! ionConductivity
+
+	!**********************************************************************************************
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERCHK ---------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine userchk() ! Set solvers parameters here
+	include 'SIZE'
+	include 'TOTAL'
+	include 'NEKUSE' 
+	!--------------------------------------------------------------
+	!------------------------Declaration --------------------------
+	!--------------------------------------------------------------
+
+
+	common /mygeom/ xmn,xmx,ymn,ymx,zmn,zmx
+	if (istep.eq.0) call domain_size(xmn,xmx,ymn,ymx,zmn,zmx)
+	!--------------------------------------------------------------
+	!------------------------DEBUGGING ----------------------------
+	!--------------------------------------------------------------
+	! call outpost (Ex, Ey, Ez, t(:,:,:,:,3), t(:,:,:,:,3), 'Elf') ! Outputs Electric Field (Elf)
+	! call outpost (t(:,:,:,:,3),t(:,:,:,:,3),t(:,:,:,:,3),t,t,'Elf')
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERQTL ---------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine userqtl ! Set thermal divergence
+	call userqtl_scig 
+
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERDAT ---------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine usrdat()   ! This routine to modify element vertices
+
+	include 'SIZE'
+	include 'TOTAL'
+
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERDAT2 --------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine usrdat2()   ! This routine to modify mesh coordinates
+
+	include 'SIZE'
+	include 'TOTAL'
+
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------USERDAT3 --------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine usrdat3() 
+	include 'SIZE'
+	include 'TOTAL'
+
+	return
+	end

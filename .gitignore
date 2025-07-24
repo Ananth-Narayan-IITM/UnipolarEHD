@@ -1,0 +1,10 @@
+*.nek5000
+*.f*
+*.log
+.state
+.usr
+makefile
+nek5000
+SESSION.NAME
+*.txt
+obj/
