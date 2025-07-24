@@ -1,7 +1,8 @@
 #!/bin/sh
+# gmsh UnipolarEHD.geo -2 -order 2 format msh2 -o UnipolarEHD.msh
 rm *.nek5000
 rm *.f*
 makenek
-nek UnipolarEHD
+nekmpi UnipolarEHD 4
 visnek
 paraview --data=UnipolarEHD.nek5000

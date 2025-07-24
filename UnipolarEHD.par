@@ -1,6 +1,6 @@
 [GENERAL]
-dt = 100
-numsteps = 1000
+dt = 1e-3
+numsteps = 10000
 writeInterval = 100
 #----------------------------------------------------------------------------------
 #----------------------------------- User Parameters ----------------------------------------
@@ -14,7 +14,7 @@ userParam06 = 0.0 # ionConductivity
 
 [VELOCITY] # ifield = 1, i = 0
 density = 1.225
-viscosity = 1.225e-5
+viscosity = 1e-5
 boundaryTypeMap = P  ,W  ,W  ,P
 residualTol = 1e-6
 
@@ -29,6 +29,7 @@ density     = 1.0 # Involves Transient evolution
 diffusivity = 1.0 # Fixed
 boundaryTypeMap = P  ,t  ,t  ,P
 residualTol = 1e-6
+
 
 [SCALAR02]  # Charge Density ifield = 4, i = 2
 density     = 1.0 # Fixed

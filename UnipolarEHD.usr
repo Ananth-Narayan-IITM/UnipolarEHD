@@ -61,17 +61,18 @@
 	!--------------------------------------------------------------
 	!------------------------Declaration --------------------------
 	!--------------------------------------------------------------
+	common /ElectricFld/ Ex (lx1,ly1,lz1,lelv),Ey (lx1,ly1,lz1,lelv)
+	common /ElectricFld/ Ez(lx1,ly1,lz1,lelv)
 	ie = gllel(eg) ! To be present after all declarations
 	!--------------------------------------------------------------
 	!------------------------Force --------------------------------
 	!--------------------------------------------------------------
-	ffx = 0.0
-	ffy = 0.0
-	ffz = 0.0
+	ffx = t(ix,iy,iz,ie,3)*Ex(ix,iy,iz,ie)/cpfld(1,2)
+	ffy = t(ix,iy,iz,ie,3)*Ey(ix,iy,iz,ie)/cpfld(1,2)
+	ffz = t(ix,iy,iz,ie,3)*Ez(ix,iy,iz,ie)/cpfld(1,2)
 	!--------------------------------------------------------------
 	!------------------------Debugging ----------------------------
 	!--------------------------------------------------------------
-
 	return
 	end
 !----------------------------------------------------------------------------------
@@ -85,12 +86,17 @@
 	!--------------------------------------------------------------
 	!------------------------Declaration --------------------------
 	!--------------------------------------------------------------
+	common /SrcFld/ srcFld4 (lx1,ly1,lz1,lelv)
 	ie = gllel(eg) ! To be present after all declarations
 	!--------------------------------------------------------------
 	!------------------------ Potential Difference ----------------
 	!--------------------------------------------------------------
-	qvol = 0.0
-	avol = 0.0
+	if (ifield .eq. 3) then 
+		qvol = t(ix,iy,iz,ie,3)/(8.8541878188e-12*uparam(2)) ! Source term for Poission Equation
+		ux = 0.0; uy = 0.0; uz = 0.0;
+	elseif (ifield .eq. 4) then
+		qvol = srcFld4(ix,iy,iz,ie)
+	endif
 	!--------------------------------------------------------------
 	!------------------------Debugging ----------------------------
 	!--------------------------------------------------------------
@@ -111,7 +117,6 @@
 	if(ifield .eq. 2) temp = 0.0 ! Temperature
 
 	if(ifield .eq. 3) then 
-		
 		if (y .lt. ymin+1.e-5*dy) then
 			temp = uparam(3)! Potential Difference
 		else
@@ -165,13 +170,33 @@
 	!--------------------------------------------------------------
 	!------------------------Declaration --------------------------
 	!--------------------------------------------------------------
-
-
+	common /ElectricFld/ Ex (lx1,ly1,lz1,lelv),Ey (lx1,ly1,lz1,lelv),Ez (lx1,ly1,lz1,lelv)
+	common /SrcFld/ srcFld4 (lx1,ly1,lz1,lelv)
+	real tmp(lx1,ly1,lz1,lelv),tmpX(lx1,ly1,lz1,lelv)
+	real tmpY(lx1,ly1,lz1,lelv),tmpZ(lx1,ly1,lz1,lelv)
+	real tmp2(lx1,ly1,lz1,lelv)
 	common /domainSize/ dy
 	if (istep.eq.0) then 
 		call domain_size(xmn,xmx,ymn,ymx,zmn,zmx)
 		dy = ymx-ymn
 	endif
+	call gradm1 (Ex, Ey, Ez, t(:,:,:,:,3))
+	Ex = -Ex; Ey = -Ey; Ez = -Ez
+	
+	call gradm1 (tmpX,tmp,tmp,ux)
+	call gradm1 (tmp,tmpY,tmp,uy)
+	call gradm1 (tmp,tmp,tmpZ,uz)
+	srcFld4 = -t(:,:,:,:,3)*(tmpX+tmpY+tmpZ)
+	tmpX = t(:,:,:,:,4)*Ex*t(:,:,:,:,3)
+	tmpY = t(:,:,:,:,4)*Ey*t(:,:,:,:,3)
+	tmpZ = t(:,:,:,:,4)*Ez*t(:,:,:,:,3)
+	
+	call gradm1 (tmp2,tmp,tmp,tmpX)
+	srcFld4 = srcFld4 - tmp2
+	call gradm1 (tmp,tmp2,tmp,tmpY)
+	srcFld4 = srcFld4 - tmp2
+	call gradm1 (tmp,tmp,tmp2,tmpZ)
+	srcFld4 = srcFld4 - tmp2
 	!--------------------------------------------------------------
 	!------------------------DEBUGGING ----------------------------
 	!--------------------------------------------------------------
@@ -214,5 +239,18 @@
 	include 'SIZE'
 	include 'TOTAL'
 
+	return
+	end
+!----------------------------------------------------------------------------------
+!-----------------------------------Divergence ------------------------------------
+!----------------------------------------------------------------------------------
+	subroutine Divergence(Div,X,Y,Z)
+	call gradm1 (Div,tmp,tmp,X)
+	X = Div
+	call gradm1 (tmp,Div,tmp,Y)
+	Y = Div
+	call gradm1 (tmp,tmp,Div,Z)
+	Z = Div
+	Div = X+Y+Z
 	return
 	end
