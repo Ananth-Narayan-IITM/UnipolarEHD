@@ -3,6 +3,6 @@
 rm *.nek5000
 rm *.f*
 makenek
-nekmpi UnipolarEHD 4
+nekmpi UnipolarEHD 8
 visnek
 paraview --data=UnipolarEHD.nek5000

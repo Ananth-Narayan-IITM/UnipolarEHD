@@ -92,10 +92,12 @@
 	!------------------------ Potential Difference ----------------
 	!--------------------------------------------------------------
 	if (ifield .eq. 3) then 
-		qvol = t(ix,iy,iz,ie,3)/(8.8541878188e-12*uparam(2)) ! Source term for Poission Equation
+		source = t(ix,iy,iz,ie,3)/(8.8541878188e-12*uparam(2)) ! Source term for Poission Equation
 		ux = 0.0; uy = 0.0; uz = 0.0;
 	elseif (ifield .eq. 4) then
-		qvol = srcFld4(ix,iy,iz,ie)
+		source = srcFld4(ix,iy,iz,ie)
+	else
+		qvol = 0.0
 	endif
 	!--------------------------------------------------------------
 	!------------------------Debugging ----------------------------
@@ -239,18 +241,5 @@
 	include 'SIZE'
 	include 'TOTAL'
 
-	return
-	end
-!----------------------------------------------------------------------------------
-!-----------------------------------Divergence ------------------------------------
-!----------------------------------------------------------------------------------
-	subroutine Divergence(Div,X,Y,Z)
-	call gradm1 (Div,tmp,tmp,X)
-	X = Div
-	call gradm1 (tmp,Div,tmp,Y)
-	Y = Div
-	call gradm1 (tmp,tmp,Div,Z)
-	Z = Div
-	Div = X+Y+Z
 	return
 	end

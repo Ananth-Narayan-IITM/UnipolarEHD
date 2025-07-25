@@ -1,5 +1,5 @@
 [GENERAL]
-dt = 1e-3
+dt = 1
 numsteps = 10000
 writeInterval = 100
 #----------------------------------------------------------------------------------
@@ -28,12 +28,12 @@ solver = none
 density     = 1.0 # Involves Transient evolution
 diffusivity = 1.0 # Fixed
 boundaryTypeMap = P  ,t  ,t  ,P
-residualTol = 1e-6
+residualTol = 1e-5
 
 
 [SCALAR02]  # Charge Density ifield = 4, i = 2
 density     = 1.0 # Fixed
-diffusivity = 1.0 # close to 0.0
+diffusivity = 1e-4 # close to 0.0
 boundaryTypeMap = P  ,SYM,t  ,P
 residualTol = 1e-6
 
