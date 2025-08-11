@@ -1,7 +1,7 @@
 #!/bin/sh
 # gmsh UnipolarEHD.geo -2 -order 2 format msh2 -o UnipolarEHD.msh
 rm *.nek5000
-rm *.f*
+rm *.f0*
 makenek
 nekmpi UnipolarEHD 8
 visnek

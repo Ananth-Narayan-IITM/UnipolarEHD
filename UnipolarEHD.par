@@ -1,7 +1,8 @@
 [GENERAL]
-dt = 1
-numsteps = 10000
-writeInterval = 100
+dt = 1e-3
+numsteps = 10000000
+writeInterval = 1000
+startFrom = UnipolarEHD0.fld time=1e3
 #----------------------------------------------------------------------------------
 #----------------------------------- User Parameters ----------------------------------------
 #----------------------------------------------------------------------------------
@@ -26,7 +27,7 @@ solver = none
 
 [SCALAR01]  # Potential Difference ifield = 3, i = 1
 density     = 1.0 # Involves Transient evolution
-diffusivity = 1.0 # Fixed
+diffusivity = 8.8541878188e-12*uparam(2) # Fixed
 boundaryTypeMap = P  ,t  ,t  ,P
 residualTol = 1e-5
 
