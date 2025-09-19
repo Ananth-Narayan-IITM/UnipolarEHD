@@ -23,9 +23,9 @@ Curve Loop(1) = {4, 1, -3, -2};
 //+
 Plane Surface(1) = {1};
 //+
-Transfinite Curve {4, 3} = 21 Using Progression 1;
+Transfinite Curve {4, 3} = 41 Using Progression 1;
 //+
-Transfinite Curve {1, 2} = 21 Using Progression 1;
+Transfinite Curve {1, 2} = 41 Using Progression 1;
 //+
 Transfinite Surface {1};
 //+

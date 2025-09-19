@@ -86,20 +86,15 @@
 	!--------------------------------------------------------------
 	!------------------------Declaration --------------------------
 	!--------------------------------------------------------------
-	common /ElectricFld/ Ex(lx1,ly1,lz1,lelv),Ey(lx1,ly1,lz1,lelv)
-	common /ElectricFld/ Ez(lx1,ly1,lz1,lelv)
+	common /SrcFld/ srcFld4 (lx1,ly1,lz1,lelv)
 	ie = gllel(eg) ! To be present after all declarations
 	!--------------------------------------------------------------
 	!------------------------ Potential Difference ----------------
 	!--------------------------------------------------------------
 	if (ifield .eq. 3) then 
 		source = t(ix,iy,iz,ie,3) ! Source term for Poission Equation
-		vx(ix,iy,iz,ie) = 0.0; vy(ix,iy,iz,ie) = 0.0; vz(ix,iy,iz,ie) = 0.0
 	elseif (ifield .eq. 4) then
-		qvol=-t(ix,iy,iz,ie,4)*t(ix,iy,iz,ie,3)**2/(8.85e-12*uparam(2))
-		vx(ix,iy,iz,ie)=t(ix,iy,iz,ie,4)*Ex(ix,iy,iz,ie)+vx(ix,iy,iz,ie)
-		vy(ix,iy,iz,ie)=t(ix,iy,iz,ie,4)*Ey(ix,iy,iz,ie)+vy(ix,iy,iz,ie)
-		vz(ix,iy,iz,ie)=t(ix,iy,iz,ie,4)*Ez(ix,iy,iz,ie)+vz(ix,iy,iz,ie)
+		avol= srcFld4(ix,iy,iz,ie)
 	else
 		qvol = 0.0
 	endif
@@ -149,10 +144,10 @@
 
 	ux = 0.0; uy = 0.0; uz = 0.0;
 	if (ifield .eq. 2) temp = 0.0 ! No temperature equation
-	if (ifield .eq. 3) temp = -uparam(3)*y+uparam(3)! Initial Potential Difference
+	if (ifield .eq. 3) temp = 0.0! Initial Potential Difference
 	if (ifield .eq. 4) temp = 0.0 ! Initial Charge Density
 	if (ifield .eq. 5) temp = uparam(5) ! ionMobility
-	if (ifield .eq. 6) temp = uparam(6) ! ionConductivity
+	if (ifield .eq. 6) temp = 0.0 ! ionConductivity
 
 	!********** Either of the (above or below) code snippet works *********************************
 
@@ -186,6 +181,9 @@
 		call domain_size(xmn,xmx,ymn,ymx,zmn,zmx)
 		dy = ymx-ymn
 	endif
+	Ex = 0.0
+	Ey = 0.0
+	Ez = 0.0
 	call gradm1 (Ex, Ey, Ez, t(:,:,:,:,2))
 	Ex = -Ex; Ey = -Ey; Ez = -Ez
 	
@@ -193,16 +191,20 @@
 	! call gradm1 (tmp,tmpY,tmp,uy)
 	! call gradm1 (tmp,tmp,tmpZ,uz)
 	! srcFld4 = -t(:,:,:,:,3)*(tmpX+tmpY+tmpZ)
-	! tmpX = t(:,:,:,:,4)*Ex*t(:,:,:,:,3)
-	! tmpY = t(:,:,:,:,4)*Ey*t(:,:,:,:,3)
-	! tmpZ = t(:,:,:,:,4)*Ez*t(:,:,:,:,3)
+	srcFld4 = 0.0
+	tmpX = t(:,:,:,:,4)*Ex*t(:,:,:,:,3)
+	tmpY = t(:,:,:,:,4)*Ey*t(:,:,:,:,3)
+	tmpZ = t(:,:,:,:,4)*Ez*t(:,:,:,:,3)
 	
-	! call gradm1 (tmp2,tmp,tmp,tmpX)
-	! srcFld4 = srcFld4 - tmp2
-	! call gradm1 (tmp,tmp2,tmp,tmpY)
-	! srcFld4 = srcFld4 - tmp2
-	! call gradm1 (tmp,tmp,tmp2,tmpZ)
-	! srcFld4 = srcFld4 - tmp2
+	call gradm1 (tmp2,tmp,tmp,tmpX)
+	srcFld4 = srcFld4 - tmp2
+	tmp2 = 0.0
+	call gradm1 (tmp,tmp2,tmp,tmpY)
+	srcFld4 = srcFld4 - tmp2
+	tmp2 = 0.0
+	call gradm1 (tmp,tmp,tmp2,tmpZ)
+	srcFld4 = srcFld4 - tmp2
+	tmp2 = 0.0
 
 	!--------------------------------------------------------------
 	!------------------------DEBUGGING ----------------------------

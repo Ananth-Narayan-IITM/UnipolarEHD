@@ -1,42 +1,39 @@
 [GENERAL]
-dt = 1e-3
-numsteps = 10000000
-writeInterval = 1000
-startFrom = UnipolarEHD0.fld time=1e3
+dt = 25
+numsteps = 880000
+writeInterval = 88000
+startFrom = UnipolarEHD3.fld time=2.6620e7
 #----------------------------------------------------------------------------------
 #----------------------------------- User Parameters ----------------------------------------
 #----------------------------------------------------------------------------------
-userParam01 = 1e-8 # ionDiffusivity
-userParam02 = 1.0 # Relative Permittivity
 userParam03 = 74.3924 # Potential Difference (Boundary Conditions)
 userParam04 = 6.5867e-11 # Charge Density (Boundary Conditions)
 userParam05 = 5.3769e-07 # ionMobility
-userParam06 = 0.0 # ionConductivity
 
 [VELOCITY] # ifield = 1, i = 0
 density = 1.225
 viscosity = 1e-5
-boundaryTypeMap = P  ,W  ,W  ,P
-residualTol = 1e-6
+boundaryTypeMap = SYM,W  ,W  ,SYM
+residualTol = 1e-10
 
 [PRESSURE]
-residualTol = 1e-4
+residualTol = 1e-10
 
 [TEMPERATURE] # Temperature ifield = 2, i = 0
 solver = none
 
 [SCALAR01]  # Potential Difference ifield = 3, i = 1
-density     = 1.0 # Involves Transient evolution
-diffusivity = 8.8541878188e-12*uparam(2) # Fixed
-boundaryTypeMap = P  ,t  ,t  ,P
-residualTol = 1e-5
+density     = 0.0
+diffusivity = 8.854187817e-12  # Fixed
+boundaryTypeMap = SYM,t  ,t  ,SYM
+residualTol = 1e-10
 
 
 [SCALAR02]  # Charge Density ifield = 4, i = 2
 density     = 1.0 # Fixed
-diffusivity = 1e-4 # close to 0.0
-boundaryTypeMap = P  ,SYM,t  ,P
-residualTol = 1e-6
+diffusivity = 1e-7 # close to 0.0
+boundaryTypeMap = SYM,SYM,t  ,SYM
+residualTol = 1e-10
 
 [SCALAR03]  # ionMobility ifield = 5, i = 3
 solver = none

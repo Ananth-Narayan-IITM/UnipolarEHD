@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.usr": "fortran",
+        "ehdFoam_b0R7.C": "cpp",
+        "ehdFoam_b0R8.C": "cpp",
+        "controldict": "cpp",
+        "writefunctions": "cpp"
+    }
+}
