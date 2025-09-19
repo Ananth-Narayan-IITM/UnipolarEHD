@@ -8,3 +8,4 @@ nek5000
 SESSION.NAME
 *.txt
 obj/
+.vscode

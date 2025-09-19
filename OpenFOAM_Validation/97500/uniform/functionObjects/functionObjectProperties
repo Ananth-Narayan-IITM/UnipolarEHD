@@ -1,0 +1,52 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2406                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    arch        "LSB;label=32;scalar=64";
+    class       dictionary;
+    location    "97500/uniform/functionObjects";
+    object      functionObjectProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+cdf7e925f5746741c316f5fbcf39ad0dfca90775
+{
+    probes
+    {
+        scalar
+        {
+            average(chargeDensity) 6.455814267835898e-11;
+            min(chargeDensity) 6.24015209050353e-11;
+            max(chargeDensity) 6.573987061927686e-11;
+            average(p)      -8.680842450722761e-10;
+            min(p)          -1.400082290892861e-09;
+            max(p)          1.749314968520962e-10;
+            average(potentialDifference) 59.58067833746227;
+            min(potentialDifference) 34.72913966028885;
+            max(potentialDifference) 73.0827441355015;
+        }
+        label
+        {
+            size(chargeDensity) 3;
+            size(p)         3;
+            size(potentialDifference) 3;
+            size(U)         3;
+        }
+        vector
+        {
+            average(U)      ( -1.18173e-10 9.36505e-08 4.64126e-30 );
+            min(U)          ( -2.02779e-10 9.307039999999999e-08 -1.78147e-33 );
+            max(U)          ( 2.86953e-11 9.416420000000001e-08 7.337689999999999e-30 );
+        }
+    }
+}
+
+
+// ************************************************************************* //

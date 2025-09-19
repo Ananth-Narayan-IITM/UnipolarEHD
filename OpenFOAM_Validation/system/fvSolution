@@ -1,0 +1,123 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    p
+    {
+        solver          GAMG;
+        tolerance       1e-8;
+        relTol          0;
+        smoother        GaussSeidel;
+        cacheAgglomeration no;
+    }
+
+    pFinal
+    {
+        $p;
+        tolerance       1e-8;
+        relTol          0;
+    }
+
+    "pcorr.*"
+    {
+        $p
+        tolerance       0.02;
+        relTol          0;
+    }
+
+    U
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-11;
+        relTol          0;
+    }
+
+    UFinal
+    {
+        $U;
+        tolerance       1e-11;
+        relTol          0;
+    }
+    
+    potentialDifference
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.2;
+    }
+
+    chargeDensity
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-08;
+        relTol          0.2;
+    }
+    
+    potentialDifferenceFinal
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0;
+    }
+
+    chargeDensityFinal
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-08;
+        relTol          0;
+    }
+
+
+}
+
+PIMPLE
+{
+    correctPhi          yes;
+    nOuterCorrectors    5;
+    nCorrectors         5;
+    nNonOrthogonalCorrectors 0;
+
+    pRefCell        0;
+    pRefValue       0;
+
+
+    consistent true;
+}
+
+
+relaxationFactors
+{
+    fields
+    {
+        p               0.8;
+        potentialDifference	0.75;
+    }
+    equations
+    {
+        U               0.6;
+        
+        chargeDensity	0.65; // Seems best range and very important for stability
+    }
+}
+
+
+// ************************************************************************* //
